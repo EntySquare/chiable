@@ -3,95 +3,31 @@ package lib
 import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/scheduling/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"os"
-	"strconv"
 )
 
 func getJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32, nodeAffinity corev1.NodeAffinity,
-	taskType string, sectorMinerIdStr string, sectorNumberStr string, proofTypeStr string, sectorSizeStr string, paramStr string, limitList corev1.ResourceList, requestList corev1.ResourceList) *batchv1.Job {
+	limitList corev1.ResourceList, requestList corev1.ResourceList, farmerKey string, poolKey string) *batchv1.Job {
+	entyChiaImage := os.Getenv("ENTY_CHIA_IMAGE")
+	entyServiceAccountName := os.Getenv("ENTY_SERVICE_ACCOUNT")
+	entyNatsServer := os.Getenv("NATS_SERVER")
 
-	notiIP := os.Getenv("CONTROLLER_NOTIFICATION")
 	sectorDataHostPath := os.Getenv("SECTOR_DATA_HOST_PATH")
-	lotusminerPath, ok := os.LookupEnv("LOTUSMINER_PATH")
-	if ok && taskType == spec.RECEIVE_COPY {
-		sectorDataHostPath = lotusminerPath
-	}
-	filtabSealerImage := os.Getenv("FILTAB_SEALER_IMAGE")
-	filtabServiceAccountName := os.Getenv("FILTAB_SERVICE_ACCOUNT")
-	filtabNatsServer := os.Getenv("NATS_SERVER")
-	reserveGiBForCopySector := os.Getenv("RESERVE_GIB_FOR_COPY_SECTOR")
-
-	filtabMinerIP := os.Getenv("MINER_IP")
-
-	filtabAddPiecePortStr := os.Getenv("FILTAB_ADDPIECE_PORT")
-	filtabAddPiecePort, err := strconv.ParseInt(filtabAddPiecePortStr, 10, 32)
-	if err != nil {
-		panic("Filtab log: FILTAB_ADDPIECE_PORT ParseInt Error")
-	}
-
-	filtabCopyPortStr := os.Getenv("FILTAB_COPY_PORT")
-	filtabCopyPort, err := strconv.ParseInt(filtabCopyPortStr, 10, 32)
-	if err != nil {
-		panic("Filtab log: FILTAB_COPY_PORT ParseInt Error")
-	}
-
-	filecoinTmpDir := "/var/tmp"
-
 	sectorDataDirHostType := corev1.HostPathDirectoryOrCreate
 	jobRestartPolicy := corev1.RestartPolicyNever
 
-	sectorDirName := os.Getenv("ALL_SECTORS_DIR")
+	dirName := os.Getenv("ALL_DIR")
 
 	//Dont Restart a failed job pod!!!
 	zeroBackoffLimitIsRetryTimeForNeverRestartFailedJobPod := int32(3)
 
 	jobLabelMaps := map[string]string{
-		"app":          "filtab-sealer",
-		"phase":        "sealing",
-		"minerid":      sectorMinerIdStr,
-		"sectornumber": sectorNumberStr,
-		"tasktype":     taskType,
+		"app":   "enty-chia",
+		"phase": "test",
 	}
 
 	priorityClassName := ""
-	if taskType == spec.COMMIT_2 {
-		priorityClassName = getPriorityClassName(sectorMinerIdStr, "0")
-	} else if taskType == spec.COMMIT_1 {
-
-		sn, err := strconv.ParseInt(sectorNumberStr, 10, 64)
-		if err != nil {
-			sn = 2
-		}
-
-		sn = sn - 2
-
-		if sn < 0 {
-			sn = 0
-		}
-
-		snstr := strconv.FormatInt(sn, 10)
-
-		priorityClassName = getPriorityClassName(sectorMinerIdStr, snstr)
-
-	} else if taskType == spec.PRE_COMMIT_2 {
-		sn, err := strconv.ParseInt(sectorNumberStr, 10, 64)
-		if err != nil {
-			sn = 1
-		}
-		sn = sn - 1
-		if sn < 0 {
-			sn = 0
-		}
-		snstr := strconv.FormatInt(sn, 10)
-
-		priorityClassName = getPriorityClassName(sectorMinerIdStr, snstr)
-	} else {
-		priorityClassName = getPriorityClassName(sectorMinerIdStr, sectorNumberStr)
-	}
 
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -111,11 +47,11 @@ func getJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 					Affinity: &corev1.Affinity{
 						NodeAffinity: &nodeAffinity,
 					},
-					ServiceAccountName: filtabServiceAccountName,
+					ServiceAccountName: entyServiceAccountName,
 					RestartPolicy:      jobRestartPolicy,
 					Volumes: []corev1.Volume{
 						{
-							Name: "sectordatadir",
+							Name: "chiadatadir",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
 									Path: sectorDataHostPath,
@@ -124,10 +60,10 @@ func getJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							},
 						},
 						{
-							Name: "filecointmpdir",
+							Name: "chiatmpdir",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
-									Path: filecoinTmpDir,
+									Path: dirName,
 									Type: &sectorDataDirHostType,
 								},
 							},
@@ -135,29 +71,19 @@ func getJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 					},
 					Containers: []corev1.Container{
 						{
-							Name:  "filtab-sealer",
-							Image: filtabSealerImage,
-							Ports: []corev1.ContainerPort{
-								{
-									Name:          "copyport",
-									ContainerPort: int32(filtabCopyPort),
-								},
-								{
-									Name:          "addpieceport",
-									ContainerPort: int32(filtabAddPiecePort),
-								},
-							},
+							Name:  "enty-chia",
+							Image: entyChiaImage,
 							VolumeMounts: []corev1.VolumeMount{
 								{
-									Name:      "sectordatadir",
-									MountPath: "/tmp/.lotusminer",
+									Name:      "chiadatadir",
+									MountPath: "/tmp/chia",
 								},
 								{
-									Name:      "filecointmpdir",
+									Name:      "chiatmpdir",
 									MountPath: "/var/tmp",
 								},
 							},
-							Command: []string{"/bin/bash", "-c", "/filtabsealer"},
+							Command: []string{". /chia-blockchain/activate", "chia plots create -f " + farmerKey + " -p " + poolKey + " -d /tmp/plots -t /tmp/cache -n 2 -r 2 -b 20000 &>plotting$i.log"},
 							Resources: corev1.ResourceRequirements{
 								Limits:   limitList,
 								Requests: requestList,
@@ -168,7 +94,7 @@ func getJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 									Value: "/tmp",
 								},
 								{
-									Name:  "FILTAB_K8S_CONFIG_IN_CLUSTER",
+									Name:  "ENTY_K8S_CONFIG_IN_CLUSTER",
 									Value: "true",
 								},
 								{
@@ -188,72 +114,12 @@ func getJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 									},
 								},
 								{
-									Name:  "SECTOR_DIR",
-									Value: sectorDirName,
-								},
-								{
-									Name:  "SECTOR_MINER_ID",
-									Value: sectorMinerIdStr,
-								},
-								{
-									Name:  "MINER_IP",
-									Value: filtabMinerIP,
-								},
-								{
-									Name:  "SECTOR_NUMBER",
-									Value: sectorNumberStr,
-								},
-								{
-									Name:  "TASK_TYPE",
-									Value: taskType,
-								},
-								{
-									Name:  "TASK_SECTOR_TYPE",
-									Value: sectorSizeStr,
-								},
-								{
-									Name:  "PROOF_TYPE",
-									Value: proofTypeStr,
-								},
-								{
 									Name:  "NATS_SERVER",
-									Value: filtabNatsServer,
+									Value: entyNatsServer,
 								},
 								{
 									Name:  "EVENTING",
 									Value: "true",
-								},
-								{
-									Name:  "PARAMS",
-									Value: paramStr,
-								},
-								{
-									Name:  "RESERVE_GIB_FOR_COPY_SECTOR",
-									Value: reserveGiBForCopySector,
-								},
-								{
-									Name:  "FIL_PROOFS_USE_GPU_TREE_BUILDER",
-									Value: "1",
-								},
-								{
-									Name:  "FIL_PROOFS_USE_GPU_COLUMN_BUILDER",
-									Value: "1",
-								},
-								{
-									Name:  "BELLMAN_CUSTOM_GPU",
-									Value: "GeForce RTX 2080 Ti:4352",
-								},
-								{
-									Name:  "RUST_BACKTRACE",
-									Value: "1",
-								},
-								{
-									Name:  "CONTROLLER_NOTIFICATION",
-									Value: notiIP,
-								},
-								{
-									Name:  "FIL_PROOFS_USE_MULTICORE_SDR",
-									Value: "0",
 								},
 							},
 						},
@@ -264,34 +130,4 @@ func getJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 	}
 
 	return job
-}
-
-func getPriorityClassName(sectorMinerIdStr string, sectorNumberStr string) string {
-	return "priority" + "-" + sectorMinerIdStr + "-" + sectorNumberStr
-}
-
-func getPriorityClass(priorityClassName string, sectorNumberStr string) v1.PriorityClass {
-
-	sectorNumber, err := strconv.ParseInt(sectorNumberStr, 10, 32)
-	if err != nil {
-		panic("Filtab log: getPriorityClass sectorNumberStr ParseInt Error")
-	}
-
-	sectorNumberInt32 := int32(sectorNumber)
-
-	K8sMaxPriorityClassValue := int32(1000 * 1000 * 1000)
-
-	modSectorNumber := sectorNumberInt32 % K8sMaxPriorityClassValue
-
-	sectorNumberPriorityValue := K8sMaxPriorityClassValue - modSectorNumber
-
-	priority := v1.PriorityClass{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: priorityClassName,
-		},
-		Value:         sectorNumberPriorityValue,
-		GlobalDefault: false,
-	}
-
-	return priority
 }
