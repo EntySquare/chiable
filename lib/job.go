@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func getJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32, nodeAffinity corev1.NodeAffinity,
+func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32, nodeAffinity corev1.NodeAffinity,
 	limitList corev1.ResourceList, requestList corev1.ResourceList, farmerKey string, poolKey string) *batchv1.Job {
 	entyChiaImage := os.Getenv("ENTY_CHIA_IMAGE")
 	entyServiceAccountName := os.Getenv("ENTY_SERVICE_ACCOUNT")
@@ -130,27 +130,4 @@ func getJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 	}
 
 	return job
-}
-
-func startSealingAffinity() corev1.NodeAffinity {
-	return corev1.NodeAffinity{
-		RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
-			NodeSelectorTerms: []corev1.NodeSelectorTerm{
-				{
-					MatchExpressions: []corev1.NodeSelectorRequirement{
-						{
-							Key:      "nodetype",
-							Operator: corev1.NodeSelectorOpIn,
-							Values:   []string{"plot"},
-						},
-						{
-							Key:      "computeState",
-							Operator: corev1.NodeSelectorOpNotIn,
-							Values:   []string{"halt"},
-						},
-					},
-				},
-			},
-		},
-	}
 }
