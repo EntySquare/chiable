@@ -48,16 +48,7 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							Name: "chiadatadir",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
-									Path: "/root/plots",
-									Type: &sectorDataDirHostType,
-								},
-							},
-						},
-						{
-							Name: "chiatmpdir",
-							VolumeSource: corev1.VolumeSource{
-								HostPath: &corev1.HostPathVolumeSource{
-									Path: "/root/cache",
+									Path: "/root/rplots",
 									Type: &sectorDataDirHostType,
 								},
 							},
@@ -70,15 +61,11 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "chiadatadir",
-									MountPath: "/root/plots",
-								},
-								{
-									Name:      "chiatmpdir",
-									MountPath: "/root/cache",
+									MountPath: "/root/rplots",
 								},
 							},
 							Command: []string{"/bin/sh", "-c"},
-							Args:    []string{". ./activate && chia init && chia plots create -f " + farmerKey + " -p " + poolKey + " -d /root/plots -t /root/cache -n 2 -r 2 -b 20000 &>plotting$i.log"},
+							Args:    []string{". ./activate && chia init && chia plots create -f " + farmerKey + " -p " + poolKey + " -d /root/rplots/plots -t /root/rplots/cach -n 2 -r 2 -b 20000 &>plotting$i.log"},
 							Resources: corev1.ResourceRequirements{
 								Limits:   limitList,
 								Requests: requestList,
