@@ -3,12 +3,14 @@ package core
 import (
 	"chiable/lib"
 	"context"
+	"fmt"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/client-go/kubernetes"
 	"log"
+	"time"
 )
 
 // static strategy
@@ -44,6 +46,7 @@ func (s *StaticStrategy) Run(n int64) error {
 		// do plot
 		s.plot()
 		i++
+		time.Sleep(time.Second)
 	}
 }
 
@@ -55,7 +58,9 @@ func (s *StaticStrategy) plot() {
 	requestList["cpu"] = resource.MustParse("2000m")
 	limitList["memory"] = resource.MustParse("20Gi")
 	requestList["memory"] = resource.MustParse("20Gi")
-	jb := lib.GetJob("entysquare-job-plot-farmer-"+s.FarmerKey+"-"+rand.String(5), 1, 30000, sf, limitList, requestList, s.FarmerKey, s.PoolKey)
+	jbname := "entysquare-job-plot-farmer-" + s.FarmerKey + "-" + rand.String(5)
+	fmt.Println("run job : " + jbname)
+	jb := lib.GetJob(jbname, 1, 30000, sf, limitList, requestList, s.FarmerKey, s.PoolKey)
 	_, err := s.client.BatchV1().Jobs("default").Create(context.TODO(), jb, metav1.CreateOptions{})
 	if err != nil {
 		log.Fatal(err)
