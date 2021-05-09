@@ -2,7 +2,7 @@ package lib
 
 import corev1 "k8s.io/api/core/v1"
 
-func StartSealingAffinity() corev1.NodeAffinity {
+func StartPlotAffinity() corev1.NodeAffinity {
 	return corev1.NodeAffinity{
 		RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
 			NodeSelectorTerms: []corev1.NodeSelectorTerm{

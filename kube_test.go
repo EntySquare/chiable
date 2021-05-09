@@ -24,7 +24,7 @@ func TestK8sJob(t *testing.T) {
 
 	}()
 
-	sf := lib.StartSealingAffinity()
+	sf := lib.StartPlotAffinity()
 	limitList := corev1.ResourceList{}
 	requestList := corev1.ResourceList{}
 	limitList["cpu"] = resource.MustParse("2000m")
