@@ -13,11 +13,11 @@ func StartSealingAffinity() corev1.NodeAffinity {
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"plot"},
 						},
-						{
-							Key:      "computeState",
-							Operator: corev1.NodeSelectorOpNotIn,
-							Values:   []string{"halt"},
-						},
+						//{
+						//	Key:      "computeState",
+						//	Operator: corev1.NodeSelectorOpNotIn,
+						//	Values:   []string{"halt"},
+						//},
 					},
 				},
 			},
