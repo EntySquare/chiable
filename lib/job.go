@@ -10,14 +10,9 @@ import (
 func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32, nodeAffinity corev1.NodeAffinity,
 	limitList corev1.ResourceList, requestList corev1.ResourceList, farmerKey string, poolKey string) *batchv1.Job {
 	entyChiaImage := os.Getenv("ENTY_CHIA_IMAGE")
-	entyServiceAccountName := os.Getenv("ENTY_SERVICE_ACCOUNT")
-	entyNatsServer := os.Getenv("NATS_SERVER")
 
-	sectorDataHostPath := os.Getenv("SECTOR_DATA_HOST_PATH")
 	sectorDataDirHostType := corev1.HostPathDirectoryOrCreate
 	jobRestartPolicy := corev1.RestartPolicyNever
-
-	dirName := os.Getenv("ALL_DIR")
 
 	//Dont Restart a failed job pod!!!
 	zeroBackoffLimitIsRetryTimeForNeverRestartFailedJobPod := int32(3)
@@ -47,14 +42,13 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 					Affinity: &corev1.Affinity{
 						NodeAffinity: &nodeAffinity,
 					},
-					ServiceAccountName: entyServiceAccountName,
-					RestartPolicy:      jobRestartPolicy,
+					RestartPolicy: jobRestartPolicy,
 					Volumes: []corev1.Volume{
 						{
 							Name: "chiadatadir",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
-									Path: sectorDataHostPath,
+									Path: "/root/plots",
 									Type: &sectorDataDirHostType,
 								},
 							},
@@ -63,7 +57,7 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							Name: "chiatmpdir",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
-									Path: dirName,
+									Path: "/root/cache",
 									Type: &sectorDataDirHostType,
 								},
 							},
@@ -76,14 +70,15 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "chiadatadir",
-									MountPath: "/tmp/chia",
+									MountPath: "/root/plots",
 								},
 								{
 									Name:      "chiatmpdir",
-									MountPath: "/var/tmp",
+									MountPath: "/root/cache",
 								},
 							},
-							Command: []string{". /chia-blockchain/activate", "chia plots create -f " + farmerKey + " -p " + poolKey + " -d /tmp/plots -t /tmp/cache -n 2 -r 2 -b 20000 &>plotting$i.log"},
+							Command: []string{"/bin/sh", "-c"},
+							Args:    []string{". ./activate && chia init && chia plots create -f " + farmerKey + " -p " + poolKey + " -d /root/plots -t /root/cache -n 2 -r 2 -b 20000 &>plotting$i.log"},
 							Resources: corev1.ResourceRequirements{
 								Limits:   limitList,
 								Requests: requestList,
@@ -112,14 +107,6 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 											FieldPath: "metadata.name",
 										},
 									},
-								},
-								{
-									Name:  "NATS_SERVER",
-									Value: entyNatsServer,
-								},
-								{
-									Name:  "EVENTING",
-									Value: "true",
 								},
 							},
 						},
