@@ -46,7 +46,7 @@ func (s *StaticStrategy) Run(n int64) error {
 		// do plot
 		s.plot()
 		i++
-		time.Sleep(time.Second)
+		time.Sleep(5 * time.Second)
 	}
 }
 
@@ -56,9 +56,10 @@ func (s *StaticStrategy) plot() {
 	requestList := corev1.ResourceList{}
 	limitList["cpu"] = resource.MustParse("2000m")
 	requestList["cpu"] = resource.MustParse("2000m")
-	limitList["memory"] = resource.MustParse("20Gi")
-	requestList["memory"] = resource.MustParse("20Gi")
-	jbname := "entysquare-job-plot-farmer-" + s.FarmerKey + "-" + rand.String(5)
+	limitList["memory"] = resource.MustParse("11Gi")
+	requestList["memory"] = resource.MustParse("11Gi")
+	farmer := s.FarmerKey[:8]
+	jbname := "entysquare-job-plot-farmer-" + farmer + "-" + rand.String(5)
 	fmt.Println("run job : " + jbname)
 	jb := lib.GetJob(jbname, 1, 30000, sf, limitList, requestList, s.FarmerKey, s.PoolKey)
 	_, err := s.client.BatchV1().Jobs("default").Create(context.TODO(), jb, metav1.CreateOptions{})

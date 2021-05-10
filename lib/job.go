@@ -65,7 +65,7 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 								},
 							},
 							Command: []string{"/bin/sh", "-c"},
-							Args:    []string{". ./activate && chia init && chia plots create -f " + farmerKey + " -p " + poolKey + " -d /root/rplots/plots -t /root/rplots/cache -b 20000"},
+							Args:    []string{". ./activate && chia init && chia plots create -f " + farmerKey + " -p " + poolKey + " -d /root/rplots/plots -t /root/rplots/cache -b 10000"},
 							Resources: corev1.ResourceRequirements{
 								Limits:   limitList,
 								Requests: requestList,
