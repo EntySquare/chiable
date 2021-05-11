@@ -56,8 +56,8 @@ func (s *StaticStrategy) plot() {
 	requestList := corev1.ResourceList{}
 	limitList["cpu"] = resource.MustParse("2000m")
 	requestList["cpu"] = resource.MustParse("2000m")
-	limitList["memory"] = resource.MustParse("11Gi")
-	requestList["memory"] = resource.MustParse("11Gi")
+	limitList["memory"] = resource.MustParse("20Gi")
+	requestList["memory"] = resource.MustParse("20Gi")
 	farmer := s.FarmerKey[:8]
 	jbname := "entysquare-job-plot-farmer-" + farmer + "-" + rand.String(5)
 	fmt.Println("run job : " + jbname)
