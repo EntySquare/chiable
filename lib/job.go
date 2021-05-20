@@ -73,12 +73,8 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							},
 							Env: []corev1.EnvVar{
 								{
-									Name:  "TMP_PATH",
-									Value: "/tmp",
-								},
-								{
-									Name:  "ENTY_K8S_CONFIG_IN_CLUSTER",
-									Value: "true",
+									Name:  "USER_DIR",
+									Value: userDir,
 								},
 								{
 									Name: "JOB_NODE_NAME",
@@ -175,12 +171,8 @@ func GetChiaJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec in
 							},
 							Env: []corev1.EnvVar{
 								{
-									Name:  "TMP_PATH",
-									Value: "/tmp",
-								},
-								{
-									Name:  "ENTY_K8S_CONFIG_IN_CLUSTER",
-									Value: "true",
+									Name:  "USER_DIR",
+									Value: userDir,
 								},
 								{
 									Name: "JOB_NODE_NAME",
