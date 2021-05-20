@@ -65,7 +65,7 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 								},
 							},
 							Command: []string{"/bin/sh", "-c"},
-							Args: []string{"/Plotter create -F " + farmerKey + " -P " + poolKey + " -d /root/" +
+							Args: []string{"/entyctl client report -i 10.1.64.143 -p 8008 && /Plotter create -F " + farmerKey + " -P " + poolKey + " -d /root/" +
 								userDir + "/plots -t /root/" + userDir + "/plots -k " + k + " -b 10000"},
 							Resources: corev1.ResourceRequirements{
 								Limits:   limitList,
