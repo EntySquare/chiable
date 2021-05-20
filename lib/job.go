@@ -48,7 +48,7 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							Name: "chiadatadir",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
-									Path: "/root/" + userDir,
+									Path: "/root/" + userDir + "/plots",
 									Type: &sectorDataDirHostType,
 								},
 							},
@@ -61,7 +61,7 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "chiadatadir",
-									MountPath: "/root/" + userDir,
+									MountPath: "/root/" + userDir + "/plots",
 								},
 							},
 							Command: []string{"/bin/sh", "-c"},
@@ -149,7 +149,7 @@ func GetChiaJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec in
 							Name: "chiadatadir",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
-									Path: "/root/" + userDir,
+									Path: "/root/" + userDir + "/plots",
 									Type: &sectorDataDirHostType,
 								},
 							},
@@ -162,7 +162,7 @@ func GetChiaJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec in
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "chiadatadir",
-									MountPath: "/root/" + userDir,
+									MountPath: "/root/" + userDir + "/plots",
 								},
 							},
 							Command: []string{"/bin/sh", "-c"},
