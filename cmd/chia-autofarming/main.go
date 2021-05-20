@@ -104,7 +104,7 @@ func manual() *cli.Command {
 				return errors.New("can't parse argument correctly")
 			}
 			return core.NewStaticStrategy(context.String("f"), context.String("p"),
-				context.String("dir"), context.String("i"), context.String("k")).Run(num)
+				context.String("d"), context.String("i"), context.String("k")).Run(num)
 		},
 	}
 	return cmd
@@ -143,7 +143,7 @@ func cmanual() *cli.Command {
 				return errors.New("can't parse argument correctly")
 			}
 			return core.NewStaticStrategy(context.String("f"), context.String("p"),
-				context.String("dir"), context.String("i"), context.String("k")).ChiaRun(num)
+				context.String("d"), context.String("i"), context.String("k")).ChiaRun(num)
 		},
 	}
 	return cmd
@@ -182,7 +182,7 @@ func tmanual() *cli.Command {
 				return errors.New("can't parse argument correctly")
 			}
 			return core.NewStaticStrategy(context.String("f"), context.String("p"),
-				context.String("dir"), context.String("i"), context.String("k")).TestRun(num)
+				context.String("d"), context.String("i"), context.String("k")).TestRun(num)
 		},
 	}
 	return cmd
