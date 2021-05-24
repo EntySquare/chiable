@@ -65,7 +65,7 @@ func (s *StaticStrategy) plot() {
 	limitList["memory"] = resource.MustParse("25Gi")
 	requestList["memory"] = resource.MustParse("8Gi")
 	farmer := s.FarmerKey[:8]
-	jbname := "entysquare-job-plot-farmer-" + farmer + "-" + rand.String(5)
+	jbname := "entysquare-k-" + s.K + "-job-plot-farmer-" + farmer + "-" + rand.String(5)
 	fmt.Println("run job : " + jbname)
 	jb := lib.GetJob(jbname, 1, 10000, sf, limitList, requestList, s.FarmerKey,
 		s.PoolKey, s.UserDir, s.ImageName, s.K)
