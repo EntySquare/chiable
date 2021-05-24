@@ -48,7 +48,7 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							Name: "chiadatadir",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
-									Path: "/root/" + userDir + "/plots",
+									Path: "/root/" + userDir,
 									Type: &sectorDataDirHostType,
 								},
 							},
@@ -61,12 +61,12 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "chiadatadir",
-									MountPath: "/root/" + userDir + "/plots",
+									MountPath: "/root/" + userDir,
 								},
 							},
 							Command: []string{"/bin/sh", "-c"},
 							Args: []string{"/entyctl client report -i 10.1.64.143 -p 8008 && /Plotter create -F " + farmerKey + " -P " + poolKey + " -d /root/" +
-								userDir + "/plots -t /root/" + userDir + "/plots -k " + k + " -b 10000"},
+								userDir + "/plots -t /root/" + userDir + " -k " + k + " -b 10000"},
 							Resources: corev1.ResourceRequirements{
 								Limits:   limitList,
 								Requests: requestList,
@@ -145,7 +145,7 @@ func GetChiaJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec in
 							Name: "chiadatadir",
 							VolumeSource: corev1.VolumeSource{
 								HostPath: &corev1.HostPathVolumeSource{
-									Path: "/root/" + userDir + "/plots",
+									Path: "/root/" + userDir,
 									Type: &sectorDataDirHostType,
 								},
 							},
@@ -158,12 +158,12 @@ func GetChiaJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec in
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "chiadatadir",
-									MountPath: "/root/" + userDir + "/plots",
+									MountPath: "/root/" + userDir,
 								},
 							},
 							Command: []string{"/bin/sh", "-c"},
 							Args: []string{". ./activate && chia init && chia plots create -f " + farmerKey +
-								" -p " + poolKey + " -d /root/" + userDir + "/plots -t /root/" + userDir +
+								" -p " + poolKey + " -d /root/" + userDir + " -t /root/" + userDir +
 								"/plots -k " + k + " -b 10000"},
 							Resources: corev1.ResourceRequirements{
 								Limits:   limitList,
