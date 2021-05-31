@@ -15,17 +15,18 @@ import (
 
 // static strategy
 type StaticStrategy struct {
-	PoolKey   string
-	FarmerKey string
-	UserDir   string
-	ImageName string
-	K         string
-	ReportIp  string
-	count     int64
-	client    *kubernetes.Clientset
+	PoolKey    string
+	FarmerKey  string
+	UserDir    string
+	ImageName  string
+	K          string
+	ReportIp   string
+	ReportPort string
+	count      int64
+	client     *kubernetes.Clientset
 }
 
-func NewStaticStrategy(farmerKey, poolKey string, userDir string, imageName string, k string, reportIp string) *StaticStrategy {
+func NewStaticStrategy(farmerKey, poolKey string, userDir string, imageName string, k string, reportIp string, reportPort string) *StaticStrategy {
 
 	kclient, err := lib.GetK8sClientSet()
 	if err != nil {
@@ -33,13 +34,14 @@ func NewStaticStrategy(farmerKey, poolKey string, userDir string, imageName stri
 	}
 
 	s := &StaticStrategy{
-		PoolKey:   poolKey,
-		FarmerKey: farmerKey,
-		UserDir:   userDir,
-		ImageName: imageName,
-		K:         k,
-		ReportIp:  reportIp,
-		client:    kclient,
+		PoolKey:    poolKey,
+		FarmerKey:  farmerKey,
+		UserDir:    userDir,
+		ImageName:  imageName,
+		K:          k,
+		ReportIp:   reportIp,
+		ReportPort: reportPort,
+		client:     kclient,
 	}
 	return s
 }
@@ -70,7 +72,7 @@ func (s *StaticStrategy) plot() {
 	jbname := "entysquare-k-" + s.K + "-job-plot-farmer-" + farmer + "-" + rand.String(5)
 	fmt.Println("run job : " + jbname)
 	jb := lib.GetJob(jbname, 1, 10000, sf, limitList, requestList, s.FarmerKey,
-		s.PoolKey, s.UserDir, s.ImageName, s.K, s.ReportIp)
+		s.PoolKey, s.UserDir, s.ImageName, s.K, s.ReportIp, s.ReportPort)
 	_, err := s.client.BatchV1().Jobs("default").Create(context.TODO(), jb, metav1.CreateOptions{})
 	if err != nil {
 		log.Fatal(err)
@@ -148,7 +150,7 @@ func (s *StaticStrategy) testPlot() {
 	jbname := "entysquare-k-" + s.K + "-job-plot-farmer-" + farmer + "-" + rand.String(5)
 	fmt.Println("run job : " + jbname)
 	jb := lib.GetJob(jbname, 1, 10000, sf, limitList, requestList, s.FarmerKey,
-		s.PoolKey, s.UserDir, s.ImageName, s.K, s.ReportIp)
+		s.PoolKey, s.UserDir, s.ImageName, s.K, s.ReportIp, s.ReportPort)
 	_, err := s.client.BatchV1().Jobs("default").Create(context.TODO(), jb, metav1.CreateOptions{})
 	if err != nil {
 		log.Fatal(err)

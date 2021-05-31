@@ -97,8 +97,12 @@ func manual() *cli.Command {
 				Usage: "k of plot",
 			},
 			&cli.StringFlag{
-				Name:  "m",
-				Usage: "manager ip to report",
+				Name:  "rp",
+				Usage: "ip to report",
+			},
+			&cli.StringFlag{
+				Name:  "po",
+				Usage: "port to report",
 			},
 		},
 		Action: func(context *cli.Context) error {
@@ -109,7 +113,7 @@ func manual() *cli.Command {
 			}
 			return core.NewStaticStrategy(context.String("f"), context.String("p"),
 				context.String("d"), context.String("i"), context.String("k"),
-				context.String("m")).Run(num)
+				context.String("rp"), context.String("po")).Run(num)
 		},
 	}
 	return cmd
@@ -141,8 +145,12 @@ func cmanual() *cli.Command {
 				Usage: "k of plot",
 			},
 			&cli.StringFlag{
-				Name:  "m",
-				Usage: "manager ip to report",
+				Name:  "rp",
+				Usage: "ip to report",
+			},
+			&cli.StringFlag{
+				Name:  "po",
+				Usage: "port to report",
 			},
 		},
 		Action: func(context *cli.Context) error {
@@ -153,7 +161,7 @@ func cmanual() *cli.Command {
 			}
 			return core.NewStaticStrategy(context.String("f"), context.String("p"),
 				context.String("d"), context.String("i"), context.String("k"),
-				context.String("m")).ChiaRun(num)
+				context.String("rp"), context.String("po")).ChiaRun(num)
 		},
 	}
 	return cmd
@@ -185,8 +193,12 @@ func tmanual() *cli.Command {
 				Usage: "k of plot",
 			},
 			&cli.StringFlag{
-				Name:  "m",
-				Usage: "manager ip to report",
+				Name:  "rp",
+				Usage: "ip to report",
+			},
+			&cli.StringFlag{
+				Name:  "po",
+				Usage: "port to report",
 			},
 		},
 		Action: func(context *cli.Context) error {
@@ -197,7 +209,7 @@ func tmanual() *cli.Command {
 			}
 			return core.NewStaticStrategy(context.String("f"), context.String("p"),
 				context.String("d"), context.String("i"), context.String("k"),
-				context.String("m")).TestRun(num)
+				context.String("rp"), context.String("po")).TestRun(num)
 		},
 	}
 	return cmd
