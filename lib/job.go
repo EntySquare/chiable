@@ -8,7 +8,7 @@ import (
 
 func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32, nodeAffinity corev1.NodeAffinity,
 	limitList corev1.ResourceList, requestList corev1.ResourceList, farmerKey string, poolKey string, userDir string,
-	imageName string, k string) *batchv1.Job {
+	imageName string, k string, reportIp string) *batchv1.Job {
 	entyChiaImage := imageName
 
 	sectorDataDirHostType := corev1.HostPathDirectoryOrCreate
@@ -65,7 +65,7 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 								},
 							},
 							Command: []string{"/bin/sh", "-c"},
-							Args: []string{"/entyctl client report -i 10.1.64.143 -p 8008 && /Plotter create -F " +
+							Args: []string{"/entyctl client report -i " + reportIp + " -p 8008 && /Plotter create -F " +
 								farmerKey + " -P " + poolKey + " -d /root/rplots/" +
 								userDir + " -t /root/rplots/" + userDir + " -k " + k + " -b 10000"},
 							Resources: corev1.ResourceRequirements{

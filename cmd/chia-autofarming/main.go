@@ -96,6 +96,10 @@ func manual() *cli.Command {
 				Name:  "k",
 				Usage: "k of plot",
 			},
+			&cli.StringFlag{
+				Name:  "m",
+				Usage: "manager ip to report",
+			},
 		},
 		Action: func(context *cli.Context) error {
 			n := context.Args().First()
@@ -104,7 +108,8 @@ func manual() *cli.Command {
 				return errors.New("can't parse argument correctly")
 			}
 			return core.NewStaticStrategy(context.String("f"), context.String("p"),
-				context.String("d"), context.String("i"), context.String("k")).Run(num)
+				context.String("d"), context.String("i"), context.String("k"),
+				context.String("m")).Run(num)
 		},
 	}
 	return cmd
@@ -135,6 +140,10 @@ func cmanual() *cli.Command {
 				Name:  "k",
 				Usage: "k of plot",
 			},
+			&cli.StringFlag{
+				Name:  "m",
+				Usage: "manager ip to report",
+			},
 		},
 		Action: func(context *cli.Context) error {
 			n := context.Args().First()
@@ -143,7 +152,8 @@ func cmanual() *cli.Command {
 				return errors.New("can't parse argument correctly")
 			}
 			return core.NewStaticStrategy(context.String("f"), context.String("p"),
-				context.String("d"), context.String("i"), context.String("k")).ChiaRun(num)
+				context.String("d"), context.String("i"), context.String("k"),
+				context.String("m")).ChiaRun(num)
 		},
 	}
 	return cmd
@@ -174,6 +184,10 @@ func tmanual() *cli.Command {
 				Name:  "k",
 				Usage: "k of plot",
 			},
+			&cli.StringFlag{
+				Name:  "m",
+				Usage: "manager ip to report",
+			},
 		},
 		Action: func(context *cli.Context) error {
 			n := context.Args().First()
@@ -182,7 +196,8 @@ func tmanual() *cli.Command {
 				return errors.New("can't parse argument correctly")
 			}
 			return core.NewStaticStrategy(context.String("f"), context.String("p"),
-				context.String("d"), context.String("i"), context.String("k")).TestRun(num)
+				context.String("d"), context.String("i"), context.String("k"),
+				context.String("m")).TestRun(num)
 		},
 	}
 	return cmd
