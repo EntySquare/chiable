@@ -67,7 +67,7 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							Command: []string{"/bin/sh", "-c"},
 							Args: []string{"/entyctl client report -i " + reportIp + " -p " + reportPort + " && /Plotter create -F " +
 								farmerKey + " -P " + poolKey + " -d /root/rplots/" + userDir + " -t /root/rplots/" + userDir +
-								" -k " + k + " -rp " + reportIp + " -po " + reportPort + " -b 10000"},
+								" -k " + k + " --rp " + reportIp + " --po " + reportPort + " -b 10000"},
 							Resources: corev1.ResourceRequirements{
 								Limits:   limitList,
 								Requests: requestList,
