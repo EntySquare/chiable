@@ -70,7 +70,7 @@ func GetJob(jobName string, jobParallelism int32, deleteJobAfterFinishSec int32,
 							//	" -k " + k + " --rp " + reportIp + " --po " + reportPort + " -b 10000"},
 							Args: []string{"/entyctl client report -i " + reportIp + " -p " + reportPort + " && /Plotter -f " +
 								farmerKey + " -p " + poolKey + " -d /root/rplots/" + userDir + " -t /root/rplots/" + userDir +
-								" -b 10000 -r 2"},
+								" -u 128 -r 2"},
 							Resources: corev1.ResourceRequirements{
 								Limits:   limitList,
 								Requests: requestList,
